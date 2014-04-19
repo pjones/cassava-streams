@@ -25,6 +25,7 @@ import Data.Csv hiding (Parser, decodeWith, decodeByNameWith)
 import Data.Csv.Incremental
 import Data.Either (lefts, rights)
 import Data.IORef
+import Data.List (intercalate)
 import System.IO.Streams (InputStream, makeInputStream)
 import qualified System.IO.Streams as Streams
 
@@ -102,15 +103,13 @@ dispatch queueRef parserRef input = do
   where
     -- Send more data to the CSV parser.  If there is no more data
     -- from upstream then send an empty @ByteString@.
-    more f = do
-      bytes <- Streams.read input
-      writeIORef parserRef (maybe (f BS.empty) f bytes)
+    more f = Streams.read input >>= writeIORef parserRef . maybe (f BS.empty) f
 
     -- Feed more data downstream or fail if some records didn't parse
     -- correctly.  The elements are wrapped in an @Either@ which
     -- indicates decoding failures.
     feed xs = if not $ null (lefts xs)
-                then bomb $ concat (lefts xs)
+                then bomb $ intercalate "\n" (lefts xs)
                 else writeIORef queueRef (rights xs) >>
                      dispatch queueRef parserRef input
 
