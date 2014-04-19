@@ -1,3 +1,4 @@
+--------------------------------------------------------------------------------
 name:          cassava-streams
 version:       0.1.0.0
 synopsis:      io-streams interface for the cassava CSV library.
@@ -9,15 +10,34 @@ copyright:     Copyright (c) 2013,2014 Peter Jones
 category:      Data, Text, CSV, IO-Streams
 build-type:    Simple
 cabal-version: >=1.10
--- description:         
--- extra-source-files:  
+-- description:
+-- extra-source-files:
 
+--------------------------------------------------------------------------------
+source-repository head
+  type:     git
+  location: https://github.com/pjones/cassava-streams.git
+
+--------------------------------------------------------------------------------
+flag maintainer
+  description: Enable settings for the package maintainer.
+  default: False
+
+--------------------------------------------------------------------------------
 library
-  -- exposed-modules:     
-  -- other-modules:       
-  -- other-extensions:    
+  exposed-modules:
+    System.IO.Streams.Csv
+  other-modules:
+    System.IO.Streams.Csv.Decode
+
   hs-source-dirs: src
   default-language: Haskell2010
+  ghc-options: -Wall
+
+  if flag(maintainer)
+    ghc-options: -Werror
+
   build-depends: base       >= 4.6   && < 5.0
+               , bytestring >= 0.10  && < 1.0
                , cassava    >= 0.3   && < 0.4
                , io-streams >= 1.1.0 && < 2.0
