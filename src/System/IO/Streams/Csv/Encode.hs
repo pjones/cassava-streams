@@ -13,11 +13,14 @@ file.
 --------------------------------------------------------------------------------
 module System.IO.Streams.Csv.Encode
        ( encodeStream
+       , encodeStreamWith
        , encodeStreamByName
+       , encodeStreamByNameWith
        ) where
 
 --------------------------------------------------------------------------------
 import Data.ByteString (ByteString)
+import qualified Data.ByteString.Lazy as BL
 import Data.Csv
 import System.IO.Streams (OutputStream, makeOutputStream)
 import qualified System.IO.Streams as Streams
@@ -26,21 +29,52 @@ import qualified System.IO.Streams as Streams
 -- | Create a new @OutputStream@ that can be fed @ToRecord@ values
 -- which are converted to CSV.  The records are encoded into
 -- @ByteString@s and passed on to the given downstream @OutputStream@.
+--
+-- Equivalent to @encodeStreamWith defaultEncodeOptions@.
 encodeStream :: ToRecord a
              => OutputStream ByteString -- ^ Downstream.
              -> IO (OutputStream a)     -- ^ New @OutputStream@.
-encodeStream output = makeOutputStream stream where
-  stream Nothing  = Streams.write Nothing output
-  stream (Just x) = Streams.writeLazyByteString (encode [x]) output
+encodeStream = encodeStreamWith defaultEncodeOptions
 
 --------------------------------------------------------------------------------
--- | Create a new @OutputStream@ that can be fed @ToNamedRecord@
--- values which are converted to CSV.  The records are encoded into
+-- | Create a new @OutputStream@ that can be fed @ToRecord@ values
+-- which are converted to CSV.  The records are encoded into
 -- @ByteString@s and passed on to the given downstream @OutputStream@.
+encodeStreamWith :: ToRecord a
+                 => EncodeOptions           -- ^ Encoding options.
+                 -> OutputStream ByteString -- ^ Downstream.
+                 -> IO (OutputStream a)     -- ^ New @OutputStream@.
+encodeStreamWith ops output =
+  makeOutputStream $ dispatch (encodeWith ops) output
+
+--------------------------------------------------------------------------------
+-- | Create a new @OutputStream@ which can be fed @ToNamedRecord@
+-- values that will be converted into CSV.  The records are encoded
+-- into @ByteString@s and passed on to the given downstream
+-- @OutputStream@.
+--
+-- Equivalent to @encodeStreamByNameWith defaultEncodeOptions@.
 encodeStreamByName :: ToNamedRecord a
                    => Header                   -- ^ CSV Header.
                    -> OutputStream ByteString  -- ^ Downstream.
                    -> IO (OutputStream a)      -- ^ New @OutputStream@.
-encodeStreamByName hdr output = makeOutputStream stream where
-  stream Nothing  = Streams.write Nothing output
-  stream (Just x) = Streams.writeLazyByteString (encodeByName hdr [x]) output
+encodeStreamByName = encodeStreamByNameWith defaultEncodeOptions
+
+--------------------------------------------------------------------------------
+-- | Create a new @OutputStream@ which can be fed @ToNamedRecord@
+-- values that will be converted into CSV.  The records are encoded
+-- into @ByteString@s and passed on to the given downstream
+-- @OutputStream@.
+encodeStreamByNameWith :: ToNamedRecord a
+                       => EncodeOptions            -- ^ Encoding options.
+                       -> Header                   -- ^ CSV Header.
+                       -> OutputStream ByteString  -- ^ Downstream.
+                       -> IO (OutputStream a)      -- ^ New @OutputStream@.
+encodeStreamByNameWith ops hdr output =
+  makeOutputStream $ dispatch (encodeByNameWith ops hdr) output
+
+--------------------------------------------------------------------------------
+-- | Do the actual encoding.
+dispatch :: ([a] -> BL.ByteString) -> OutputStream ByteString -> Maybe a -> IO ()
+dispatch _   output Nothing  = Streams.write Nothing output
+dispatch enc output (Just x) = Streams.writeLazyByteString (enc [x]) output
