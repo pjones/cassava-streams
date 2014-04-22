@@ -11,7 +11,23 @@ file.
 -}
 
 --------------------------------------------------------------------------------
-module System.IO.Streams.Csv (module Export) where
+-- | This module exports functions which can be used to read instances
+-- of the cassava classes @FromRecord@ and @FromNamedRecord@ from an
+-- io-streams @InputStream ByteString@.  It also exports functions
+-- which can write instances of @ToRecord@ and @ToNamedRecord@ to an
+-- io-streams @OutputStream ByteString@.
+module System.IO.Streams.Csv
+       ( -- * Decoding
+         decodeStream
+       , decodeStreamWith
+       , decodeStreamByName
+       , decodeStreamByNameWith
+
+         -- * Encoding
+       , encodeStream
+       , encodeStreamByName
+       ) where
 
 --------------------------------------------------------------------------------
-import System.IO.Streams.Csv.Decode as Export
+import System.IO.Streams.Csv.Decode
+import System.IO.Streams.Csv.Encode
