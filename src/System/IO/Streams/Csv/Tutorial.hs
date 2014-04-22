@@ -85,6 +85,12 @@ instance ToField TState where
 -- 'decodeStreamByName' which converts the @InputStream ByteString@
 -- stream into an @InputStream Item@ stream.
 --
+-- Notice that the cassava-streams function 'onlyValidRecords' is used
+-- to transform the decoding stream into one that only produces valid
+-- records.  Any records which fail type conversion (via
+-- @FromNamedRecord@ or @FromRecord@) will not escape from
+-- 'onlyValidRecords' but instead will throw an exception.
+--
 -- Finally the io-streams @filter@ function is used to filter the
 -- input stream so that it only produces to-do items which haven't
 -- been completed.
@@ -93,8 +99,8 @@ onlyTodo :: Handle -- ^ Input handle where CSV data can be read.
          -> IO ()
 onlyTodo inH outH = do
   -- A stream which produces items which are not 'Done'.
-  input  <- Streams.handleToInputStream inH   >>=
-            decodeStreamByName                >>=
+  input  <- Streams.handleToInputStream inH         >>=
+            decodeStreamByName >>= onlyValidRecords >>=
             Streams.filter (\item -> state item /= Done)
 
   -- A stream to write items into.  They will be converted to CSV.
@@ -120,8 +126,8 @@ markDone titleOfItem inH outH = do
 
   -- A stream which produces items and converts matching items to the
   -- 'Done' state.
-  input  <- Streams.handleToInputStream inH   >>=
-            decodeStreamByName                >>=
+  input  <- Streams.handleToInputStream inH         >>=
+            decodeStreamByName >>= onlyValidRecords >>=
             Streams.map markDone'
 
   -- A stream to write items into.  They will be converted to CSV.

@@ -16,6 +16,7 @@ module System.IO.Streams.Csv.Decode
        , decodeStreamWith
        , decodeStreamByName
        , decodeStreamByNameWith
+       , onlyValidRecords
        ) where
 
 --------------------------------------------------------------------------------
@@ -23,9 +24,7 @@ import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import Data.Csv hiding (Parser, decodeWith, decodeByNameWith)
 import Data.Csv.Incremental
-import Data.Either (lefts, rights)
 import Data.IORef
-import Data.List (intercalate)
 import System.IO.Streams (InputStream, makeInputStream)
 import qualified System.IO.Streams as Streams
 
@@ -35,19 +34,26 @@ import qualified System.IO.Streams as Streams
 --
 -- Equivalent to @decodeStreamWith defaultDecodeOptions@.
 decodeStream :: (FromRecord a)
-             => HasHeader              -- ^ Whether to skip a header or not.
-             -> InputStream ByteString -- ^ Upstream.
-             -> IO (InputStream a)     -- ^ An @InputStream@ which produces records.
+             => HasHeader
+             -- ^ Whether to skip a header or not.
+             -> InputStream ByteString
+             -- ^ Upstream.
+             -> IO (InputStream (Either String a))
+             -- ^ An @InputStream@ which produces records.
 decodeStream = decodeStreamWith defaultDecodeOptions
 
 --------------------------------------------------------------------------------
 -- | Create an @InputStream@ which decodes CSV records from the given
 -- upstream data source.
 decodeStreamWith :: (FromRecord a)
-                 => DecodeOptions           -- ^ CSV decoding options.
-                 -> HasHeader               -- ^ Whether to skip a header or not.
-                 -> InputStream ByteString  -- ^ Upstream.
-                 -> IO (InputStream a)      -- ^ An @InputStream@ which produces records.
+                 => DecodeOptions
+                 -- ^ CSV decoding options.
+                 -> HasHeader
+                 -- ^ Whether to skip a header or not.
+                 -> InputStream ByteString
+                 -- ^ Upstream.
+                 -> IO (InputStream (Either String a))
+                 -- ^ An @InputStream@ which produces records.
 decodeStreamWith ops hdr input = do
   queue  <- newIORef []
   parser <- newIORef $ Just (decodeWith ops hdr)
@@ -59,17 +65,22 @@ decodeStreamWith ops hdr input = do
 --
 -- Equivalent to @decodeStreamByNameWith defaultDecodeOptions@.
 decodeStreamByName :: (FromNamedRecord a)
-                   => InputStream ByteString -- ^ Upstream.
-                   -> IO (InputStream a)     -- ^ An @InputStream@ which produces records.
+                   => InputStream ByteString
+                   -- ^ Upstream.
+                   -> IO (InputStream (Either String a))
+                   -- ^ An @InputStream@ which produces records.
 decodeStreamByName = decodeStreamByNameWith defaultDecodeOptions
 
 --------------------------------------------------------------------------------
 -- | Create an @InputStream@ which decodes CSV records from the given
 -- upstream data source.  Data should be preceded by a header.
 decodeStreamByNameWith :: (FromNamedRecord a)
-                       => DecodeOptions          -- ^ CSV decoding options.
-                       -> InputStream ByteString -- ^ Upstream.
-                       -> IO (InputStream a)     -- ^ An @InputStream@ which produces records.
+                       => DecodeOptions
+                       -- ^ CSV decoding options.
+                       -> InputStream ByteString
+                       -- ^ Upstream.
+                       -> IO (InputStream (Either String a))
+                       -- ^ An @InputStream@ which produces records.
 decodeStreamByNameWith ops input = go (decodeByNameWith ops) where
   -- Dispatch on the HeaderParser type.
   go (FailH _ e)  = bomb e
@@ -80,11 +91,31 @@ decodeStreamByNameWith ops input = go (decodeByNameWith ops) where
     makeInputStream (dispatch queue parser input)
 
 --------------------------------------------------------------------------------
+-- | Creates a new @InputStream@ which only sends valid CSV records
+-- downstream.  The first invalid record will throw an exception.
+onlyValidRecords :: InputStream (Either String a)
+                 -- ^ Upstream.
+                 -> IO (InputStream a)
+                 -- ^ An @InputStream@ which only produces valid
+                 -- records.
+onlyValidRecords input = makeInputStream $ do
+  upstream <- Streams.read input
+
+  case upstream of
+    Nothing         -> return Nothing
+    Just (Left err) -> bomb err -- FIXME: replace with throwIO
+    Just (Right x)  -> return (Just x)
+
+--------------------------------------------------------------------------------
 -- | Internal function which feeds data to the CSV parser.
-dispatch :: IORef [a]                 -- ^ List of queued CSV records.
-         -> IORef (Maybe (Parser a))  -- ^ Current CSV parser state.
-         -> InputStream ByteString    -- ^ Upstream.
-         -> IO (Maybe a)              -- ^ Data feed downstream.
+dispatch :: IORef [Either String a]
+         -- ^ List of queued CSV records.
+         -> IORef (Maybe (Parser a))
+         -- ^ Current CSV parser state.
+         -> InputStream ByteString
+         -- ^ Upstream.
+         -> IO (Maybe (Either String a))
+         -- ^ Data feed downstream.
 dispatch queueRef parserRef input = do
   queue <- readIORef queueRef
 
@@ -107,13 +138,9 @@ dispatch queueRef parserRef input = do
     more f = Streams.read input >>=
              writeIORef parserRef . Just . maybe (f BS.empty) f
 
-    -- Feed more data downstream or fail if some records didn't parse
-    -- correctly.  The elements are wrapped in an @Either@ which
-    -- indicates decoding failures.
-    feed xs = if not $ null (lefts xs)
-                then bomb $ intercalate "\n" (lefts xs)
-                else writeIORef queueRef (rights xs) >>
-                     dispatch queueRef parserRef input
+    -- Feed records downstream.
+    feed xs = writeIORef queueRef xs >>
+              dispatch queueRef parserRef input
 
 --------------------------------------------------------------------------------
 -- | FIXME: use a proper exception.

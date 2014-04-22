@@ -24,6 +24,16 @@ module System.IO.Streams.Csv
          -- | These functions convert an io-streams @InputStream
          -- ByteString@ stream into one that decodes CSV records and
          -- produces these decoded records.
+         --
+         -- Each of the decoding functions produce an @InputStream@
+         -- which yields an @Either@ value.  @Left String@ represents
+         -- a record which failed type conversion.  @Right a@ is a
+         -- successfully decoded record.
+         --
+         -- See the tutorial in "System.IO.Streams.Csv.Tutorial" for
+         -- details on how to use the 'onlyValidRecords' function to
+         -- transform the decoding streams so that they only produce
+         -- valid records and throw exceptions for bad records.
          module System.IO.Streams.Csv.Decode
 
          -- * Encoding CSV
