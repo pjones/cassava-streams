@@ -13,19 +13,24 @@ file.
 --------------------------------------------------------------------------------
 -- | This module exports functions which can be used to read instances
 -- of the cassava classes @FromRecord@ and @FromNamedRecord@ from an
--- io-streams @InputStream ByteString@.  It also exports functions
--- which can write instances of @ToRecord@ and @ToNamedRecord@ to an
--- io-streams @OutputStream ByteString@.
+-- io-streams @InputStream ByteString@.
+--
+-- It also exports functions which can write instances of @ToRecord@
+-- and @ToNamedRecord@ to an io-streams @OutputStream ByteString@.
+--
+-- See the "System.IO.Streams.Csv.Tutorial" module for a simple tutorial.
 module System.IO.Streams.Csv
-       ( -- * Decoding
-         decodeStream
-       , decodeStreamWith
-       , decodeStreamByName
-       , decodeStreamByNameWith
+       ( -- * Decoding CSV
+         -- | These functions convert an io-streams @InputStream
+         -- ByteString@ stream into one that decodes CSV records and
+         -- produces these decoded records.
+         module System.IO.Streams.Csv.Decode
 
-         -- * Encoding
-       , encodeStream
-       , encodeStreamByName
+         -- * Encoding CSV
+         -- | These functions convert an io-streams @OutputStream
+         -- ByteString@ stream into one that encodes records into CSV
+         -- format before sending them downstream.
+       , module System.IO.Streams.Csv.Encode
        ) where
 
 --------------------------------------------------------------------------------

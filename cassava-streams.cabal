@@ -16,6 +16,8 @@ bug-reports:   https://github.com/pjones/cassava-streams/issues
 description:
   The cassava-streams library glues togeter the cassava CSV library
   and the io-streams streaming library.
+  .
+  See the "System.IO.Streams.Csv.Tutorial" module for a simple tutorial.
 
 --------------------------------------------------------------------------------
 extra-source-files:
@@ -36,6 +38,7 @@ flag maintainer
 library
   exposed-modules:
     System.IO.Streams.Csv
+    System.IO.Streams.Csv.Tutorial
   other-modules:
     System.IO.Streams.Csv.Encode
     System.IO.Streams.Csv.Decode
@@ -52,3 +55,4 @@ library
                , bytestring >= 0.10  && < 1.0
                , cassava    >= 0.3   && < 0.4
                , io-streams >= 1.1.0 && < 2.0
+               , vector     >= 0.10  && < 1.0
