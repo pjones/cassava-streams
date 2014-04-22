@@ -50,7 +50,7 @@ decodeStreamWith :: (FromRecord a)
                  -> IO (InputStream a)      -- ^ An @InputStream@ which produces records.
 decodeStreamWith ops hdr input = do
   queue  <- newIORef []
-  parser <- newIORef (decodeWith ops hdr)
+  parser <- newIORef $ Just (decodeWith ops hdr)
   makeInputStream (dispatch queue parser input)
 
 --------------------------------------------------------------------------------
@@ -76,15 +76,15 @@ decodeStreamByNameWith ops input = go (decodeByNameWith ops) where
   go (PartialH f) = Streams.read input >>= go . maybe (f BS.empty) f
   go (DoneH _ p)  = do
     queue  <- newIORef []
-    parser <- newIORef p
+    parser <- newIORef (Just p)
     makeInputStream (dispatch queue parser input)
 
 --------------------------------------------------------------------------------
 -- | Internal function which feeds data to the CSV parser.
-dispatch :: IORef [a]              -- ^ List of queued CSV records.
-         -> IORef (Parser a)       -- ^ Current CSV parser state.
-         -> InputStream ByteString -- ^ Upstream.
-         -> IO (Maybe a)           -- ^ Data feed downstream.
+dispatch :: IORef [a]                 -- ^ List of queued CSV records.
+         -> IORef (Maybe (Parser a))  -- ^ Current CSV parser state.
+         -> InputStream ByteString    -- ^ Upstream.
+         -> IO (Maybe a)              -- ^ Data feed downstream.
 dispatch queueRef parserRef input = do
   queue <- readIORef queueRef
 
@@ -92,9 +92,10 @@ dispatch queueRef parserRef input = do
     [] -> do
       parser <- readIORef parserRef
       case parser of
-        Fail _  e -> bomb e
-        Many xs f -> more f >> feed xs
-        Done xs   -> feed xs
+        Nothing          -> return Nothing
+        Just (Fail _  e) -> bomb e
+        Just (Many xs f) -> more f >> feed xs
+        Just (Done xs  ) -> writeIORef parserRef Nothing >> feed xs
 
     (x:xs) -> do
       writeIORef queueRef xs
@@ -103,7 +104,8 @@ dispatch queueRef parserRef input = do
   where
     -- Send more data to the CSV parser.  If there is no more data
     -- from upstream then send an empty @ByteString@.
-    more f = Streams.read input >>= writeIORef parserRef . maybe (f BS.empty) f
+    more f = Streams.read input >>=
+             writeIORef parserRef . Just . maybe (f BS.empty) f
 
     -- Feed more data downstream or fail if some records didn't parse
     -- correctly.  The elements are wrapped in an @Either@ which

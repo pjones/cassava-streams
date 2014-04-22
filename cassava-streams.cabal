@@ -23,6 +23,7 @@ description:
 extra-source-files:
   README.md
   CHANGELOG
+  test/simple.csv
 
 --------------------------------------------------------------------------------
 source-repository head
@@ -32,6 +33,11 @@ source-repository head
 --------------------------------------------------------------------------------
 flag maintainer
   description: Enable settings for the package maintainer.
+  default: False
+
+--------------------------------------------------------------------------------
+flag tutorial
+  description: Build the tutorial binary (useful for profiling).
   default: False
 
 --------------------------------------------------------------------------------
@@ -56,3 +62,18 @@ library
                , cassava    >= 0.3   && < 0.4
                , io-streams >= 1.1.0 && < 2.0
                , vector     >= 0.10  && < 1.0
+
+--------------------------------------------------------------------------------
+executable tutorial
+  default-language: Haskell2010
+  hs-source-dirs: bin
+  main-is: tutorial.hs
+  ghc-options: -O2 -Wall -Werror -rtsopts
+  ghc-prof-options: -fprof-auto-top -fprof-cafs
+
+  if !flag(tutorial)
+    buildable: False
+  else
+    build-depends: base
+                 , cassava-streams
+                 , io-streams

@@ -95,7 +95,7 @@ onlyTodo inH outH = do
   -- A stream which produces items which are not 'Done'.
   input  <- Streams.handleToInputStream inH   >>=
             decodeStreamByName                >>=
-            Streams.filter (\item -> state item == Done)
+            Streams.filter (\item -> state item /= Done)
 
   -- A stream to write items into.  They will be converted to CSV.
   output <- Streams.handleToOutputStream outH >>=
