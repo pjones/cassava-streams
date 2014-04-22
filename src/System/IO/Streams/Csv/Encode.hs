@@ -44,8 +44,7 @@ encodeStreamWith :: ToRecord a
                  => EncodeOptions           -- ^ Encoding options.
                  -> OutputStream ByteString -- ^ Downstream.
                  -> IO (OutputStream a)     -- ^ New @OutputStream@.
-encodeStreamWith ops output =
-  makeOutputStream $ dispatch (encodeWith ops) output
+encodeStreamWith ops = makeOutputStream . dispatch (encodeWith ops)
 
 --------------------------------------------------------------------------------
 -- | Create a new @OutputStream@ which can be fed @ToNamedRecord@
@@ -70,8 +69,8 @@ encodeStreamByNameWith :: ToNamedRecord a
                        -> Header                   -- ^ CSV Header.
                        -> OutputStream ByteString  -- ^ Downstream.
                        -> IO (OutputStream a)      -- ^ New @OutputStream@.
-encodeStreamByNameWith ops hdr output =
-  makeOutputStream $ dispatch (encodeByNameWith ops hdr) output
+encodeStreamByNameWith ops hdr =
+  makeOutputStream . dispatch (encodeByNameWith ops hdr)
 
 --------------------------------------------------------------------------------
 -- | Do the actual encoding.
