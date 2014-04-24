@@ -19,9 +19,11 @@ module System.IO.Streams.Csv.Encode
        ) where
 
 --------------------------------------------------------------------------------
+import Control.Monad (when)
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Lazy as BL
 import Data.Csv
+import Data.IORef
 import System.IO.Streams (OutputStream, makeOutputStream)
 import qualified System.IO.Streams as Streams
 
@@ -44,7 +46,9 @@ encodeStreamWith :: ToRecord a
                  => EncodeOptions           -- ^ Encoding options.
                  -> OutputStream ByteString -- ^ Downstream.
                  -> IO (OutputStream a)     -- ^ New @OutputStream@.
-encodeStreamWith ops = makeOutputStream . dispatch (encodeWith ops)
+encodeStreamWith opts output = do
+  ref <- newIORef opts
+  makeOutputStream (dispatch encodeWith ref output)
 
 --------------------------------------------------------------------------------
 -- | Create a new @OutputStream@ which can be fed @ToNamedRecord@
@@ -69,11 +73,19 @@ encodeStreamByNameWith :: ToNamedRecord a
                        -> Header                   -- ^ CSV Header.
                        -> OutputStream ByteString  -- ^ Downstream.
                        -> IO (OutputStream a)      -- ^ New @OutputStream@.
-encodeStreamByNameWith ops hdr =
-  makeOutputStream . dispatch (encodeByNameWith ops hdr)
+encodeStreamByNameWith opts hdr output = do
+  ref <- newIORef opts
+  makeOutputStream $ dispatch (\opts' -> encodeByNameWith opts' hdr) ref output
 
 --------------------------------------------------------------------------------
--- | Do the actual encoding.
-dispatch :: ([a] -> BL.ByteString) -> OutputStream ByteString -> Maybe a -> IO ()
-dispatch _   output Nothing  = Streams.write Nothing output
-dispatch enc output (Just x) = Streams.writeLazyByteString (enc [x]) output
+-- | Encode records, ensuring that the header is written no more than once.
+dispatch :: (EncodeOptions -> [a] -> BL.ByteString) -- ^ Encoding function.
+         -> IORef EncodeOptions                     -- ^ Encoding options.
+         -> OutputStream ByteString                 -- ^ Downstream.
+         -> Maybe a                                 -- ^ Record to write.
+         -> IO ()
+dispatch _   _   output Nothing  = Streams.write Nothing output
+dispatch enc ref output (Just x) = do
+  opts <- readIORef ref
+  when (encIncludeHeader opts) $ writeIORef ref (opts {encIncludeHeader = False})
+  Streams.writeLazyByteString (enc opts [x]) output
