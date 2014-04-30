@@ -1,3 +1,5 @@
+{-# LANGUAGE  DeriveDataTypeable #-}
+
 {-
 
 This file is part of the Haskell package cassava-streams. It is
@@ -12,7 +14,8 @@ file.
 
 --------------------------------------------------------------------------------
 module System.IO.Streams.Csv.Decode
-       ( decodeStream
+       ( StreamDecodingError (..)
+       , decodeStream
        , decodeStreamWith
        , decodeStreamByName
        , decodeStreamByNameWith
@@ -20,13 +23,23 @@ module System.IO.Streams.Csv.Decode
        ) where
 
 --------------------------------------------------------------------------------
+import Control.Exception
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import Data.Csv hiding (Parser, decodeWith, decodeByNameWith)
 import Data.Csv.Incremental
 import Data.IORef
+import Data.Typeable
 import System.IO.Streams (InputStream, makeInputStream)
 import qualified System.IO.Streams as Streams
+
+--------------------------------------------------------------------------------
+-- | Exception thrown when stream decoding cannot continue due to an
+-- error.
+data StreamDecodingError = StreamDecodingError String
+  deriving (Typeable, Show)
+
+instance Exception StreamDecodingError
 
 --------------------------------------------------------------------------------
 -- | Create an @InputStream@ which decodes CSV records from the given
@@ -103,7 +116,7 @@ onlyValidRecords input = makeInputStream $ do
 
   case upstream of
     Nothing         -> return Nothing
-    Just (Left err) -> bomb err -- FIXME: replace with throwIO
+    Just (Left err) -> bomb err
     Just (Right x)  -> return (Just x)
 
 --------------------------------------------------------------------------------
@@ -143,6 +156,6 @@ dispatch queueRef parserRef input = do
               dispatch queueRef parserRef input
 
 --------------------------------------------------------------------------------
--- | FIXME: use a proper exception.
+-- | Throw an exception.
 bomb :: String -> IO a
-bomb = fail
+bomb = throwIO . StreamDecodingError
