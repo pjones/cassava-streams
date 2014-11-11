@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 name:          cassava-streams
-version:       0.1.0.0
+version:       0.1.1.0
 synopsis:      io-streams interface for the cassava CSV library.
 license:       BSD3
 license-file:  LICENSE
@@ -10,7 +10,7 @@ copyright:     Copyright (c) 2014 Peter Jones
 category:      Data, Text, CSV, IO-Streams
 build-type:    Simple
 cabal-version: >=1.10
-tested-with:   GHC==7.8.2
+tested-with:   GHC==7.8.2, GHC==7.8.3
 homepage:      https://github.com/pjones/cassava-streams
 bug-reports:   https://github.com/pjones/cassava-streams/issues
 description:

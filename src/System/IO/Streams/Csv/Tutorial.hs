@@ -41,18 +41,21 @@ import System.IO.Streams.Csv
 --------------------------------------------------------------------------------
 -- | A to-do item.
 data Item = Item
-  { title :: String
-  , state :: TState
+  { title :: String       -- ^ Title.
+  , state :: TState       -- ^ State.
+  , time  :: Maybe Double -- ^ Seconds taken to complete.
   } deriving (Show, Eq)
 
 instance FromNamedRecord Item where
   parseNamedRecord m = Item <$> m .: "Title"
                             <*> m .: "State"
+                            <*> m .: "Time"
 
 instance ToNamedRecord Item where
-  toNamedRecord (Item t s) =
+  toNamedRecord (Item t s tm) =
     namedRecord [ "Title" .= t
                 , "State" .= s
+                , "Time"  .= tm
                 ]
 
 --------------------------------------------------------------------------------
@@ -105,7 +108,7 @@ onlyTodo inH outH = do
 
   -- A stream to write items into.  They will be converted to CSV.
   output <- Streams.handleToOutputStream outH >>=
-            encodeStreamByName (V.fromList ["State", "Title"])
+            encodeStreamByName (V.fromList ["State", "Time", "Title"])
 
   -- Connect the input and output streams.
   Streams.connect input output
@@ -132,7 +135,7 @@ markDone titleOfItem inH outH = do
 
   -- A stream to write items into.  They will be converted to CSV.
   output <- Streams.handleToOutputStream outH >>=
-            encodeStreamByName (V.fromList ["State", "Title"])
+            encodeStreamByName (V.fromList ["State", "Time", "Title"])
 
   -- Connect the input and output streams.
   Streams.connect input output

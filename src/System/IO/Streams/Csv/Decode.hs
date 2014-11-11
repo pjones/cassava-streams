@@ -1,4 +1,5 @@
 {-# LANGUAGE  DeriveDataTypeable #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 {-
 
@@ -116,12 +117,12 @@ onlyValidRecords input = makeInputStream $ do
 
   case upstream of
     Nothing         -> return Nothing
-    Just (Left err) -> bomb err
+    Just (Left err) -> bomb ("invalid CSV row: " ++ err)
     Just (Right x)  -> return (Just x)
 
 --------------------------------------------------------------------------------
 -- | Internal function which feeds data to the CSV parser.
-dispatch :: IORef [Either String a]
+dispatch :: forall a. IORef [Either String a]
          -- ^ List of queued CSV records.
          -> IORef (Maybe (Parser a))
          -- ^ Current CSV parser state.
@@ -137,9 +138,10 @@ dispatch queueRef parserRef input = do
       parser <- readIORef parserRef
       case parser of
         Nothing          -> return Nothing
-        Just (Fail _  e) -> bomb e
-        Just (Many xs f) -> more f >> feed xs
-        Just (Done xs  ) -> writeIORef parserRef Nothing >> feed xs
+        Just (Fail _  e)  -> bomb ("input data malformed: " ++ e)
+        Just (Many [] f) -> more f
+        Just (Many xs f) -> writeIORef parserRef (Just $ Many [] f) >> feed xs
+        Just (Done xs  ) -> writeIORef parserRef Nothing            >> feed xs
 
     (x:xs) -> do
       writeIORef queueRef xs
@@ -148,12 +150,15 @@ dispatch queueRef parserRef input = do
   where
     -- Send more data to the CSV parser.  If there is no more data
     -- from upstream then send an empty @ByteString@.
-    more f = Streams.read input >>=
-             writeIORef parserRef . Just . maybe (f BS.empty) f
+    more :: (ByteString -> Parser a) -> IO (Maybe (Either String a))
+    more f = do bs <- Streams.read input
+                writeIORef parserRef (Just $ maybe (f BS.empty) f bs)
+                dispatch queueRef parserRef input
 
     -- Feed records downstream.
-    feed xs = writeIORef queueRef xs >>
-              dispatch queueRef parserRef input
+    feed :: [Either String a] -> IO (Maybe (Either String a))
+    feed xs = do writeIORef queueRef xs
+                 dispatch queueRef parserRef input
 
 --------------------------------------------------------------------------------
 -- | Throw an exception.
