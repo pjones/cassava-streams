@@ -6,7 +6,7 @@ TMP_DUMMY     = $(TMPDIR)/.dummy
 STACK_OPTS    = --stack-yaml=build/stack.yaml
 
 ################################################################################
-.PHONY: all test clean
+.PHONY: all test clean release
 
 ################################################################################
 all: $(TMP_DUMMY)
@@ -21,3 +21,8 @@ test:
 ################################################################################
 clean:
 	stack $(STACK_OPTS) clean
+
+################################################################################
+release:
+	$(MAKE) clean test
+	stack $(STACK_OPTS) upload .

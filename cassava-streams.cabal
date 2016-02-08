@@ -41,6 +41,7 @@ flag maintainer
 --------------------------------------------------------------------------------
 flag tutorial
   description: Build the tutorial binary (useful for profiling).
+  manual: True
   default: False
 
 --------------------------------------------------------------------------------
@@ -54,11 +55,11 @@ library
 
   hs-source-dirs: src
   default-language: Haskell2010
-  ghc-options: -O2 -Wall -fwarn-incomplete-uni-patterns
-  ghc-prof-options: -prof -auto-all
+  ghc-options: -Wall -fwarn-incomplete-uni-patterns
 
   if flag(maintainer)
     ghc-options: -Werror
+    ghc-prof-options: -prof -auto-all
 
   build-depends: base       >= 4.6   && < 5.0
                , bytestring >= 0.10  && < 0.11
@@ -71,8 +72,11 @@ executable tutorial
   default-language: Haskell2010
   hs-source-dirs: bin
   main-is: tutorial.hs
-  ghc-options: -O2 -Wall -Werror -rtsopts
-  ghc-prof-options: -fprof-auto-top -fprof-cafs
+  ghc-options: -Wall -fwarn-incomplete-uni-patterns -rtsopts
+
+  if flag(maintainer)
+    ghc-options: -Werror
+    ghc-prof-options: -fprof-auto-top -fprof-cafs
 
   if !flag(tutorial)
     buildable: False
@@ -87,7 +91,11 @@ test-suite test
   default-language: Haskell2010
   hs-source-dirs: test
   main-is: test.hs
-  ghc-options: -O2 -Wall -Werror
+  ghc-options: -Wall -fwarn-incomplete-uni-patterns
+
+  if flag(maintainer)
+    ghc-options: -Werror
+
   build-depends: base
                , QuickCheck >= 2.7 && < 3.0
                , bytestring
