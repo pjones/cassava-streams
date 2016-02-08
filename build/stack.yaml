@@ -1,0 +1,9 @@
+resolver: lts-5.2
+
+packages:
+  - ../
+
+flags:
+  cassava-streams:
+    maintainer: true
+    tutorial: true

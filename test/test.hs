@@ -19,7 +19,7 @@ module Main (main) where
 import Control.Monad
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
-import Data.Csv hiding (Record, NamedRecord, record)
+import Data.Csv hiding (Record, NamedRecord, record, header)
 import qualified Data.Vector as V
 import System.IO.Streams (InputStream, OutputStream)
 import qualified System.IO.Streams as Streams
@@ -96,8 +96,8 @@ prop_indexedRoundTrip recsIn = not (null recsIn) ==> monadicIO $ do
 --------------------------------------------------------------------------------
 tests :: TestTree
 tests = testGroup "Tests"
-        [ QC.testProperty "namedRoundTrip"   $ prop_namedRoundTrip
-        , QC.testProperty "indexedRoundTrip" $ prop_indexedRoundTrip
+        [ QC.testProperty "namedRoundTrip"   prop_namedRoundTrip
+        , QC.testProperty "indexedRoundTrip" prop_indexedRoundTrip
         ]
 
 --------------------------------------------------------------------------------

@@ -75,7 +75,7 @@ encodeStreamByNameWith :: ToNamedRecord a
                        -> IO (OutputStream a)      -- ^ New @OutputStream@.
 encodeStreamByNameWith opts hdr output = do
   ref <- newIORef opts
-  makeOutputStream $ dispatch (\opts' -> encodeByNameWith opts' hdr) ref output
+  makeOutputStream $ dispatch (`encodeByNameWith` hdr) ref output
 
 --------------------------------------------------------------------------------
 -- | Encode records, ensuring that the header is written no more than once.

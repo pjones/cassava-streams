@@ -30,7 +30,6 @@ module System.IO.Streams.Csv.Tutorial
        ) where
 
 --------------------------------------------------------------------------------
-import Control.Applicative
 import Control.Monad
 import Data.Csv
 import qualified Data.Vector as V
