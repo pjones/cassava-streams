@@ -43,8 +43,7 @@ module System.IO.Streams.Csv
        , module System.IO.Streams.Csv.Encode
 
          -- * Convenience Exports
-         -- | Export @HasHeader@ from cassava so we can use it without
-         -- importing Data.Csv
+         -- | Export data types from Data.Csv
        , module Data.Csv
        ) where
 
@@ -52,4 +51,10 @@ module System.IO.Streams.Csv
 import System.IO.Streams.Csv.Decode
 import System.IO.Streams.Csv.Encode
 
-import Data.Csv (HasHeader(..))
+import Data.Csv ( HasHeader(..)
+                , defaultEncodeOptions
+                , defaultDecodeOptions
+                , DecodeOptions(..)
+                , EncodeOptions(..)
+                , Quoting(..)
+                )
