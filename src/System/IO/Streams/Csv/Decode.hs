@@ -1,4 +1,4 @@
-{-# LANGUAGE  DeriveDataTypeable #-}
+{-# LANGUAGE DeriveDataTypeable  #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 {-

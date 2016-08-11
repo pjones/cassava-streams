@@ -12,7 +12,7 @@ STACK_OPTS    = --stack-yaml=build/stack.yaml
 all: $(TMP_DUMMY)
 	stack $(STACK_OPTS) setup
 	stack $(STACK_OPTS) build
-	hlint src test
+	hlint --hint data/HLint.hs src test
 
 ################################################################################
 test:
