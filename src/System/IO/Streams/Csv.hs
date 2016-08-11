@@ -41,8 +41,20 @@ module System.IO.Streams.Csv
          -- ByteString@ stream into one that encodes records into CSV
          -- format before sending them downstream.
        , module System.IO.Streams.Csv.Encode
+
+         -- * Convenience Exports
+         -- | Export data types from Data.Csv
+       , module Data.Csv
        ) where
 
 --------------------------------------------------------------------------------
 import System.IO.Streams.Csv.Decode
 import System.IO.Streams.Csv.Encode
+
+import Data.Csv ( HasHeader(..)
+                , defaultEncodeOptions
+                , defaultDecodeOptions
+                , DecodeOptions(..)
+                , EncodeOptions(..)
+                , Quoting(..)
+                )
