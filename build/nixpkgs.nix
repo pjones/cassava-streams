@@ -8,6 +8,7 @@ stdenv.mkDerivation {
     haskell.packages.lts-6_7.ghc
 
     # Non-Haskell Dependencies:
+    gnupg     # For signing packages.
     zlib
   ];
 }
