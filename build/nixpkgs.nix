@@ -5,7 +5,7 @@ stdenv.mkDerivation {
 
   buildInputs = [
     # GHC:
-    haskell.packages.lts-4_2.ghc
+    haskell.packages.lts-6_7.ghc
 
     # Non-Haskell Dependencies:
     zlib
