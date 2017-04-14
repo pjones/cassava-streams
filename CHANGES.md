@@ -1,5 +1,11 @@
 # Change Log / Release Notes
 
+## 0.3.0.1 (April 14, 2017)
+
+  * Updated to LTS Haskell 8.9
+
+  * Bumped dependencies
+
 ## 0.3.0.0 (August 11, 2016)
 
   * Add some additional (convenience) exports from `Data.Csv`. (Thanks

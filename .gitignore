@@ -1,8 +1,3 @@
-/dist
-/.cabal-sandbox
-/cabal.sandbox.config
 /test/massive.csv
 /.stack-work
 /build/.stack-work
-/default.nix
-/stack.yaml

@@ -1,16 +1,16 @@
 --------------------------------------------------------------------------------
 name:          cassava-streams
-version:       0.3.0.0
+version:       0.3.0.1
 synopsis:      io-streams interface for the cassava CSV library.
 license:       BSD3
 license-file:  LICENSE
 author:        Peter Jones <pjones@devalot.com>
 maintainer:    Peter Jones <pjones@devalot.com>
-copyright:     Copyright (c) 2014-2016 Peter Jones
+copyright:     Copyright (c) 2014-2017 Peter Jones
 category:      Data, Text, CSV, IO-Streams
 build-type:    Simple
 cabal-version: >=1.18
-tested-with:   GHC==7.10.3
+tested-with:   GHC==7.10.3, GHC==8.0.2
 homepage:      https://github.com/pjones/cassava-streams
 bug-reports:   https://github.com/pjones/cassava-streams/issues
 description:
@@ -24,8 +24,7 @@ extra-source-files:
   README.md
   CHANGES.md
   test/*.csv
-  build/*.yaml
-  build/*.nix
+  stack.yaml
 
 --------------------------------------------------------------------------------
 source-repository head
@@ -64,7 +63,7 @@ library
                , bytestring >= 0.10  && < 0.11
                , cassava    >= 0.4   && < 0.5
                , io-streams >= 1.1   && < 1.4
-               , vector     >= 0.10  && < 0.12
+               , vector     >= 0.10  && < 0.13
 
 --------------------------------------------------------------------------------
 executable tutorial
