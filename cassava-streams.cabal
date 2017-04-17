@@ -59,7 +59,7 @@ library
   if flag(maintainer)
     ghc-options: -Werror
 
-  build-depends: base       >= 4.6   && < 5.0
+  build-depends: base       >= 4.8   && < 5.0
                , bytestring >= 0.10  && < 0.11
                , cassava    >= 0.4   && < 0.5
                , io-streams >= 1.1   && < 1.4
