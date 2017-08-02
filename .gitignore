@@ -1,3 +1,4 @@
 /test/massive.csv
 /.stack-work
 /build/.stack-work
+/dist

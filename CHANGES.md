@@ -1,5 +1,11 @@
 # Change Log / Release Notes
 
+## 0.3.0.2 (Next Release)
+
+  * Updated to LTS Haskell 8.24
+
+  * Bumped dependencies
+
 ## 0.3.0.1 (April 14, 2017)
 
   * Updated to LTS Haskell 8.9
