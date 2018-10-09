@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 name:          cassava-streams
-version:       0.3.0.2
+version:       0.3.0.3
 synopsis:      io-streams interface for the cassava CSV library.
 license:       BSD3
 license-file:  LICENSE
@@ -100,6 +100,6 @@ test-suite test
                , cassava
                , cassava-streams
                , io-streams
-               , tasty >= 0.8 && < 1.1
+               , tasty >= 0.8 && < 1.2
                , tasty-quickcheck >= 0.8 && < 1.0
                , vector

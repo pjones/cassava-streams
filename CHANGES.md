@@ -1,5 +1,9 @@
 # Change Log / Release Notes
 
+## 0.3.0.3 (October 09, 2018)
+
+ * Bumped dependencies
+
 ## 0.3.0.2 (March 20, 2018)
 
   * Updated to LTS Haskell 11.1

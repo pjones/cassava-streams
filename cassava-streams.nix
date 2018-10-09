@@ -3,7 +3,7 @@
 }:
 mkDerivation {
   pname = "cassava-streams";
-  version = "0.3.0.2";
+  version = "0.3.0.3";
   src = ./.;
   isLibrary = true;
   isExecutable = true;
