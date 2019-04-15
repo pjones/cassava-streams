@@ -3,7 +3,7 @@
 }:
 mkDerivation {
   pname = "cassava-streams";
-  version = "0.3.0.3";
+  version = "0.3.0.4";
   src = ./.;
   isLibrary = true;
   isExecutable = true;
@@ -14,7 +14,7 @@ mkDerivation {
     base bytestring cassava io-streams QuickCheck tasty
     tasty-quickcheck vector
   ];
-  homepage = "https://github.com/pjones/cassava-streams";
+  homepage = "https://code.devalot.com/open/cassava-streams";
   description = "io-streams interface for the cassava CSV library";
   license = stdenv.lib.licenses.bsd3;
 }

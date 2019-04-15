@@ -1,5 +1,11 @@
 # Change Log / Release Notes
 
+## 0.3.0.4 (April 15, 2019)
+
+ * Bumped dependencies
+
+ * Builds on NixOS 18.09, 19.03, and unstable
+
 ## 0.3.0.3 (October 09, 2018)
 
  * Bumped dependencies

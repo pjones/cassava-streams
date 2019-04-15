@@ -1,9 +1,0 @@
-resolver: lts-11.1
-
-packages:
-  - ./
-
-flags:
-  cassava-streams:
-    maintainer: true
-    tutorial: true

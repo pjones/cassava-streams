@@ -1,18 +1,17 @@
 --------------------------------------------------------------------------------
 name:          cassava-streams
-version:       0.3.0.3
+version:       0.3.0.4
 synopsis:      io-streams interface for the cassava CSV library.
 license:       BSD3
 license-file:  LICENSE
 author:        Peter Jones <pjones@devalot.com>
 maintainer:    Peter Jones <pjones@devalot.com>
-copyright:     Copyright (c) 2014-2018 Peter Jones
+copyright:     Copyright (c) 2014-2019 Peter Jones
 category:      Data, Text, CSV, IO-Streams
 build-type:    Simple
 cabal-version: 1.18
-tested-with:   GHC==7.10.3, GHC==8.0.2
-homepage:      https://github.com/pjones/cassava-streams
-bug-reports:   https://github.com/pjones/cassava-streams/issues
+homepage:      https://code.devalot.com/open/cassava-streams
+bug-reports:   https://code.devalot.com/open/cassava-streams/issues
 description:
   The cassava-streams library glues togeter the cassava CSV library
   and the io-streams streaming library.
@@ -24,18 +23,11 @@ extra-source-files:
   README.md
   CHANGES.md
   test/*.csv
-  stack.yaml
 
 --------------------------------------------------------------------------------
 source-repository head
   type:     git
-  location: https://github.com/pjones/cassava-streams.git
-
---------------------------------------------------------------------------------
-flag maintainer
-  description: Enable settings for the package maintainer.
-  manual: True
-  default: False
+  location: https://code.devalot.com/open/cassava-streams.git
 
 --------------------------------------------------------------------------------
 flag tutorial
@@ -56,9 +48,6 @@ library
   default-language: Haskell2010
   ghc-options: -Wall -fwarn-incomplete-uni-patterns
 
-  if flag(maintainer)
-    ghc-options: -Werror
-
   build-depends: base       >= 4.8   && < 5.0
                , bytestring >= 0.10  && < 0.11
                , cassava    >= 0.4   && < 0.6
@@ -71,10 +60,6 @@ executable tutorial
   hs-source-dirs: bin
   main-is: tutorial.hs
   ghc-options: -Wall -fwarn-incomplete-uni-patterns -rtsopts
-
-  if flag(maintainer)
-    ghc-options: -Werror
-    ghc-prof-options: -fprof-auto-top -fprof-cafs
 
   if !flag(tutorial)
     buildable: False
@@ -91,15 +76,12 @@ test-suite test
   main-is: test.hs
   ghc-options: -Wall -fwarn-incomplete-uni-patterns
 
-  if flag(maintainer)
-    ghc-options: -Werror
-
   build-depends: base
                , QuickCheck >= 2.7 && < 3.0
                , bytestring
                , cassava
                , cassava-streams
                , io-streams
-               , tasty >= 0.8 && < 1.2
-               , tasty-quickcheck >= 0.8 && < 1.0
+               , tasty            >= 0.8 && < 1.3
+               , tasty-quickcheck >= 0.8 && < 1.3
                , vector
