@@ -37,7 +37,7 @@ import qualified System.IO.Streams as Streams
 --------------------------------------------------------------------------------
 -- | Exception thrown when stream decoding cannot continue due to an
 -- error.
-data StreamDecodingError = StreamDecodingError String
+newtype StreamDecodingError = StreamDecodingError String
   deriving (Typeable, Show)
 
 instance Exception StreamDecodingError

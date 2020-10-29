@@ -70,7 +70,7 @@ roundTrip is os recs = do
   Streams.connect sourceList encoder
 
   -- Decode from ByteString.
-  decoder <- fmap BS.concat encoded >>= Streams.fromByteString >>= is
+  decoder <- (encoded >>= Streams.fromByteString . BS.concat) >>= is
   (decodeStream, decoded) <- Streams.listOutputStream
   Streams.connect decoder decodeStream
   decoded

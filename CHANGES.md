@@ -1,28 +1,6 @@
 # Change Log / Release Notes
 
-## 0.3.0.4 (April 15, 2019)
-
- * Bumped dependencies
-
- * Builds on NixOS 18.09, 19.03, and unstable
-
-## 0.3.0.3 (October 09, 2018)
-
- * Bumped dependencies
-
-## 0.3.0.2 (March 20, 2018)
-
-  * Updated to LTS Haskell 11.1
-
-  * Bumped dependencies
-
-## 0.3.0.1 (April 14, 2017)
-
-  * Updated to LTS Haskell 8.9
-
-  * Bumped dependencies
-
-## 0.3.0.0 (August 11, 2016)
+## 0.3 (August 11, 2016)
 
   * Add some additional (convenience) exports from `Data.Csv`. (Thanks
     goes to Florian Hofmann.)
@@ -30,6 +8,14 @@
   * Added `data/HLint.hs`
 
   * Updated to LTS Haskell 6.7
+
+  * Minor updates:
+
+    - 0.3.0.1 (April 14, 2017): Updated dependencies
+    - 0.3.0.2 (March 20, 2018): Updated dependencies
+    - 0.3.0.3 (October 09, 2018): Updated dependencies
+    - 0.3.0.4 (April 15, 2019): Updated dependencies
+    - 0.3.0.5 (October 29, 2020): Update dependencies
 
 ## 0.2.0.0 (February 8, 2016)
 

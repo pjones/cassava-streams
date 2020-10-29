@@ -3,3 +3,4 @@
 /build/.stack-work
 /dist
 /result
+/.cabal/
